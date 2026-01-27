@@ -33,13 +33,17 @@ all_messages = [{
 
 while True:
   user_input = input("\n\033[1;31mUser: \033[0m")
+  # User Commands
   if user_input.lower() == "/exit":
     sys.exit("Chat wird beendet...")
   elif user_input.lower() == "/help":
     helpmessage()
     continue
   elif user_input.lower() == "/new chat":
-    os.system("cls") # Wird genutzt um vorherige nachrichten zu löschen
+    try:
+      os.system("cls") # Wird genutzt um vorherige nachrichten zu löschen
+    except Exception as error:
+      print("OS System Fehler: ",error)
     print("\033[1mNeuer Chat:\033[0m")
     helpmessage()
   
@@ -78,7 +82,7 @@ while True:
         print(chunk.message.content, end="", flush=True)
         output_chatbot += chunk.message.content
 
-    except ollama.ResponseError as error:
+    except ollama.ResponseError or ollama.RequestError as error:
       print("Ollama-Fehler:", error)
 
     except Exception as error:
