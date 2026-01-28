@@ -2,19 +2,19 @@ import ollama
 import sys
 import os
 
-def startupmessage():
+def startup_messages():
   print("Willkommen zum AI Chatbot")
-  print("-------------------------")
-  print()
+  print("-------------------------" \
+  "\n")
 
-def helpmessage():
-  print("Um denn Chat zu beenden: \033[36m/Exit\033[0m")
-  print("Um einen Neuen Chat zu öffnen: \033[36m/New Chat\033[0m")
+def help_messages():
+  print("Um den Chat zu beenden: \033[36m/Exit\033[0m")
+  print("Um einen neuen Chat zu öffnen: \033[36m/New Chat\033[0m")
   print("Um die Modell Infos anzuschauen: \033[36m/Info\033[0m")
   print("Um Chat aufzuräumen: \033[36m/Clear\033[0m")
   print("Um die Commands aufzurufen: \033[36m/Help\033[0m")
 
-def showinfo():
+def show_model_infos():
   model_name = "\033[36mLlama3.1:8b\033[0m"
   model_owner = "\033[36mMeta\033[0m"
   release_date_model = "\033[36mJuli 23, 2024\033[0m"
@@ -28,35 +28,39 @@ def clear_console():
 def shutdown_ollama():
   os.system("ollama stop llama3.1:8b")
 
-startupmessage()
-helpmessage()
+startup_messages()
+help_messages()
 
 all_messages = [{
   "role": "system",
   "content": (
     "Das hier sind deine Grenzen die du als Ai Chatbot nicht überschreiten oder einhalten solltest."
-    "Du bist ein Ai Chatbot dessen Standardsprache deutsch ist."
-    "Du bist ein Ai Chatbot der die Sprache (Deustch) nicht während dem Nutzen aufeinmal ändert."
-    "Falls der User auf eine andere Spache wechseln will muss er das zuerst bestätigen."
-    "Das Nutzen von Englischen Wörtern ist erlaubt aber dabei bleibt man bei der Standardsprache."
-    "Der Output sollte Hilfreich, Kurz und Prägnant sein."
+    "Du bist ein Ai Chatbot dessen Standardsprache Deutsch ist."
+    "Du bist ein Ai Chatbot der die Sprache (Deutsch) nicht während dem Nutzen aufeinmal ändert."
+    "Falls der User auf eine andere Sprache wechseln will muss er das zuerst bestätigen."
+    "Das Nutzen von englischen Wörtern ist erlaubt aber dabei bleibt man bei der Standardsprache."
+    "Der Output sollte hilfreich, kurz und prägnant sein."
     "Du versuchst immer so hilfreich wie möglich zu sein um den User zu helfen."
     "Falls der Output länger wird kannst du den User fragen ob das okay ist und der sagt dann ob das okay ist oder nicht."
-    "Wenn du etwas nicht was der User fragt nicht weisst, dann sage ihm das und halte dich Kurz."
+    "Wenn du etwas nicht was der User fragt nicht weisst, dann sage ihm das und halte dich kurz."
   )
 }]
 
 try:
   while True:
     user_input = input("\n\033[1;31mUser: \033[0m")
-    # User Commands
+
     if user_input.lower() == "/exit":
-      shutdown_ollama() # Stoppt Ollama (gegen RAM Probleme)
+      shutdown_ollama()
       clear_console()
-      sys.exit("Chat wird beendet...")
+      try:
+        sys.exit("Chat wird beendet...")
+      except Exception:
+        print("Chat wird beendet...")
+        break
 
     elif user_input.lower() == "/help":
-      helpmessage()
+      help_messages()
       continue
 
     elif user_input.lower() == "/new chat":
@@ -65,26 +69,25 @@ try:
       except Exception as error:
         print("OS System Fehler: ",error)
       print("\033[1mNeuer Chat:\033[0m")
-      helpmessage()
-
+      help_messages()
       all_messages = [{
       "role": "system",
       "content": (
       "Das hier sind deine Grenzen die du als Ai Chatbot nicht überschreiten oder einhalten solltest."
-      "Du bist ein Ai Chatbot dessen Standardsprache deutsch ist."
-      "Du bist ein Ai Chatbot der die Sprache (Deustch) nicht während dem Nutzen aufeinmal ändert."
-      "Falls der User auf eine andere Spache wechseln will muss er das zuerst bestätigen."
-      "Das Nutzen von Englischen Wörtern ist erlaubt aber dabei bleibt man bei der Standardsprache."
-      "Der Output sollte Hilfreich, Kurz und Prägnant sein."
+      "Du bist ein Ai Chatbot dessen Standardsprache Deutsch ist."
+      "Du bist ein Ai Chatbot der die Sprache (Deutsch) nicht während dem Nutzen aufeinmal ändert."
+      "Falls der User auf eine andere Sprache wechseln will muss er das zuerst bestätigen."
+      "Das Nutzen von englischen Wörtern ist erlaubt aber dabei bleibt man bei der Standardsprache."
+      "Der Output sollte hilfreich, kurz und prägnant sein."
       "Du versuchst immer so hilfreich wie möglich zu sein um den User zu helfen."
       "Falls der Output länger wird kannst du den User fragen ob das okay ist und der sagt dann ob das okay ist oder nicht."
-      "Wenn du etwas nicht was der User fragt nicht weisst, dann sage ihm das und halte dich Kurz."
+      "Wenn du etwas nicht was der User fragt nicht weisst, dann sage ihm das und halte dich kurz."
       )
       }]
       continue
   
     elif user_input.lower() == "/info":
-      showinfo()
+      show_model_infos()
       continue
 
     elif user_input.lower() == "/clear":
@@ -109,8 +112,9 @@ try:
       output_chatbot = ""
 
       try:
+        # Schnittstelle für Ollama In/Output
         stream = ollama.chat(
-              model='llama3.1:8b', # <- Modell ändern falls nötig
+              model='llama3.1:8b',
               messages=all_messages,
               stream=True,
           )
