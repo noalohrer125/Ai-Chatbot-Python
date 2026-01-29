@@ -28,6 +28,7 @@ def clear_console():
 def shutdown_ollama():
   os.system("ollama stop llama3.1:8b")
 
+# TODO: würde ich nach Initialisierung von all_messages platzieren
 startup_messages()
 help_messages()
 
@@ -50,6 +51,12 @@ try:
   while True:
     user_input = input("\n\033[1;31mUser: \033[0m")
 
+    # TODO: hier wäre switch case übersichtlicher
+    # switch user_input.lower():
+    #   case "/exit":
+    #     ...
+    #   case "/help":
+    #     ...
     if user_input.lower() == "/exit":
       shutdown_ollama()
       clear_console()
@@ -67,9 +74,10 @@ try:
       try:
         clear_console()
       except Exception as error:
-        print("OS System Fehler: ",error)
+        print("OS System Fehler: ",error) # ! hier würde ich einen andren Text ausgeben, jemand der nicht Entwickler ist hat keine ahnung was ein OS System Fehler ist
       print("\033[1mNeuer Chat:\033[0m")
       help_messages()
+      # TODO: warum initialisierst du das hier nochmal? (bereits auf Zeile 35 global definiert)
       all_messages = [{
       "role": "system",
       "content": (
@@ -94,7 +102,7 @@ try:
       try:
         clear_console()
       except Exception as error:
-        print("OS System Fehler: ",error)
+        print("OS System Fehler: ",error) # ! hier würde ich einen andren Text ausgeben, jemand der nicht Entwickler ist hat keine ahnung was ein OS System Fehler ist
       print("Chat wurde aufgeräumt.")
       continue
     
@@ -111,22 +119,25 @@ try:
       print("\033[1;32mOutput: \033[0m", end="", flush=True)
       output_chatbot = ""
 
+      # TODO: diesen Try Block würde ich in eine Funktion (zB. process_ai_response) auslagern, die als Input die Eingabe vom User bekommt und als Output die Antwort vom Chatbot zurückgibt
       try:
         # Schnittstelle für Ollama In/Output
         stream = ollama.chat(
               model='llama3.1:8b',
               messages=all_messages,
               stream=True,
-          )
+          ) # ! Einrückung evtl. anpassen hier
 
         for chunk in stream:
           print(chunk.message.content, end="", flush=True)
           output_chatbot += chunk.message.content
 
       except ollama.ResponseError as error:
+        # ! hier würde ich einen andren Text ausgeben, jemand der nicht Informatiker ist hat keine ahnung was eine response ist
         print("Ollama-Fehler (Response Error):", error)
 
       except ollama.RequestError as error:
+        # ! hier würde ich einen andren Text ausgeben, jemand der nicht Informatiker ist hat keine ahnung was ein request ist
         print("Ollama Fehler (Request Error): ",error)
 
       except Exception as error:
@@ -144,4 +155,5 @@ except KeyboardInterrupt:
     print("Ollama konnte ich nicht Beendet werden da Ollama nicht Läuft: ", error)
   except KeyboardInterrupt:
     pass
+  # ! hier würde ich eher sagen "abgebrochen" statt "unterbrochen"
   print("\nProgramm wurde durch Benutzer unterbrochen. (KeyboardInterrupt)")
